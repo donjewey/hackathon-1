@@ -3,16 +3,8 @@
     "name": "ShopList",
     "version": "1.0",
     "description": "a centralized wish list",
-    "content_scripts": [
-        {
-            "matches": [
-                "https://www.google.com/*"
-            ],
-            "js": [
-                "./main.js"
-            ]
-        }
-    ],
+    "content_scripts": [],
+    "icons": {},
     "background": {
         "service_worker": "background.js",
         "action": {
@@ -21,5 +13,11 @@
         "permissions": [
             "storage"
         ]
-    }
+    },
+    "action": {},
+    "permissions": [
+        "storage",
+        "downloads",
+        "tabs"
+    ]
 }
