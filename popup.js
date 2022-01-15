@@ -9,39 +9,36 @@
 // categories??
 
 document.addEventListener("DOMContentLoaded", () => {
-    const border = document.getElementById('border');
+
     const body = document.body;
+    const border = document.createElement('div');
+    border.setAttribute('id', 'border');
+    body.appendChild(border);
 
     // array of objects,
     // object format: name, price, url
     const itemArray = [];
 
+    chrome.runtime.connect({ name: "popup" });
+
     // extract stored list from chrome storage 
-    chrome.storage.sync.get('items', function (save) {
-        if ((save.items !== undefined || save.items) &&
+    chrome.storage.sync.get(['items'], function (save) {
+        if ((save.items !== undefined && save.items) &&
             Array.isArray(save.items)) {
-            for (let item of save.items) {
-                itemArray.push(item);
+            for (let i = 0; i < save.items.length; i++) {
+                itemArray.push(save.items[i]);
             }
+            displayStoredObjects(itemArray, listDiv);
         }
     });
 
-    // // upon closing window or tab, save data into storage
-    // window.addEventListener("beforeunload", function (e) {
-    //     chrome.storage.sync.set({ objStorage: itemArray }, function () {
-    //         console.log('saved object list into chrome storage');
-    //     });
-    // });
-
-    window.addEventListener("unload", function () {
-        chrome.storage.sync.set({ 'items': itemArray });
-    });
 
 
     const nameBox = document.createElement("input");
     const priceBox = document.createElement("input");
     const urlBox = document.createElement("input");
     const submit = document.createElement("button");
+    // const saveList = document.createElement("button");
 
     // builds HTML of user input
     const buildInputs = function () {
@@ -65,9 +62,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         submit.setAttribute('id', 'submitButton')
         border.appendChild(submit)
-        submit.innerText = "Add to List"
+        submit.innerText = "Add to List";
 
+        // saveList.setAttribute('id', 'saveButton')
+        // border.appendChild(saveList);
+        // saveList.innerText = "Save List";
     }
+
+    //saves list when button is pressed
+    // saveList.addEventListener("click", function () {
+    //     // chrome.storage.sync.set({ 'items': itemArray });
+    // });
 
     // items header
     const listDiv = document.createElement("div");
@@ -84,9 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const imgLogos = {
-        'amazon.com': "img/amazon_logo.png",
+        'amazon.com': "img/amazon_logo.jpg",
         'target.com': 'img/target_logo.png',
         'walmart.com': 'img/walmart_logo.jpeg',
+        'ebay.com': 'img/ebay_logo.png'
     }
 
     // redraw list of objects
@@ -94,9 +100,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (itemArray === []) return
         if (listDiv.hasChildNodes()) listDiv.innerHTML = '';
         for (let j = 0; j < listOfObj.length; j++) {
-            const objList = document.createElement('ul');
-            objList.setAttribute('class', 'objList')
-            objList.setAttribute('id', "" + j)
+            const objList = document.createElement('div');
+            objList.setAttribute('class', 'objList');
+            objList.setAttribute('id', "" + j);
+            objList.setAttribute('display', 'flex');
+            objList.setAttribute('justify-content', 'center');
+            objList.setAttribute('align-items', 'center');
 
             // obj image -check what website item is on
             let imgURL = '';
@@ -107,24 +116,37 @@ document.addEventListener("DOMContentLoaded", () => {
             // if website not found, use default cart logo
             if (imgURL === '') imgURL = 'img/cart_logo.jpeg';
 
+            const objRef = document.createElement('a')
+            objRef.setAttribute('href', listOfObj[j].url);
             const objImg = document.createElement('img');
             objImg.setAttribute('src', imgURL);
             objImg.setAttribute('class', 'objImage');
-            objList.appendChild(objImg);
+            objImg.setAttribute('width', '25%');
+            objList.appendChild(objRef);
+            objRef.appendChild(objImg);
+
+            objImg.onclick = function () {
+                window.open(listOfObj[j].url);
+            }
 
             // obj name
-            const objNameList = document.createElement('li');
+            const objNameList = document.createElement('p');
             objNameList.setAttribute('class', 'objName');
             objNameList.setAttribute('id', `objName${j}`)
-            objNameList.style.color = 'white'
+            objNameList.style.color = 'white';
+            objNameList.style.fontSize = 'large';
             objNameList.innerText = listOfObj[j].name;
+            // objNameList.setAttribute('list-style-type', 'none');
             objList.appendChild(objNameList);
 
             // obj price
-            const objPriceList = document.createElement('li');
+            const objPriceList = document.createElement('p');
             objPriceList.setAttribute('class', 'objPrice');
+            objPriceList.setAttribute('id', `objPrice${j}`)
             objPriceList.style.color = 'white'
+            objNameList.style.fontSize = 'large';
             objPriceList.innerText = listOfObj[j].price;
+            // objPriceList.setAttribute('list-style-type', 'none');
             objList.appendChild(objPriceList);
 
             //remove button
@@ -133,16 +155,20 @@ document.addEventListener("DOMContentLoaded", () => {
             removeBtn.innerText = 'Bought It!';
             objList.appendChild(removeBtn);
 
+            removeBtn.appendChild(document.createElement('br'))
+
             removeBtn.addEventListener("click", () => {
                 const nodeToRemove = removeBtn.parentNode;
                 const nameToRemove = document.getElementById('objName' + nodeToRemove.id).innerText
+                const priceToRemove = document.getElementById('objPrice' + nodeToRemove.id).innerText
                 nodeToRemove.parentNode.removeChild(nodeToRemove);
                 // nodeToRemove.innerHTML = '';
                 for (let i = 0; i < listOfObj.length; i++) {
-                    if (listOfObj[i].name === nameToRemove) {
+                    if (listOfObj[i].name === nameToRemove && listOfObj[i].price === priceToRemove) {
                         listOfObj.splice(i, 1)
                         displayStoredObjects(listOfObj, listDiv);
-                        return;
+                        chrome.storage.sync.set({ 'items': listOfObj });
+                        return
                     }
                 }
             });
@@ -151,12 +177,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    buildInputs()
-    displayDivForObjects()
-    displayStoredObjects(itemArray, listDiv);
-
-
-
+    buildInputs();
+    displayDivForObjects();
+    
 
     submit.addEventListener("click", () => {
         let tempItemObj = {}
@@ -172,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
             urlBox.value = ''
 
             itemArray.push(tempItemObj)
-
+            chrome.storage.sync.set({ 'items': itemArray });
             displayStoredObjects(itemArray, listDiv);
         }
     })
@@ -192,45 +215,57 @@ document.addEventListener("DOMContentLoaded", () => {
             "color": "white"
         },
         "#border": {
+            "display": "block",
             "text-align": "center",
             // "border": "2px solid white",
             "height": "15%",
             "width": "95%",
-            "position": "relative"
         },
         "#submitButton": {
             'display': 'block',
             "margin": "auto",
             "text-align": "center",
-            'padding': '0.5rem',
+            'padding': '0.3rem',
             "outline": "none",
             "border": "none",
-            "background-color": "#FFB6C1",
+            "background-color": "#FFF",
             "color": "#585858",
-            "border-radius": ".5rem",
+            "border-radius": ".3rem",
+            'cursor': 'pointer',
+            'transition': '0.3s',
+            'margin-top' : '5px'
+        },
+        "#saveButton": {
+            'display': 'block',
+            "margin": "auto",
+            "text-align": "center",
+            'padding': '0.3rem',
+            "outline": "none",
+            "border": "none",
+            "background-color": "#FFF",
+            "color": "#585858",
+            "border-radius": ".3rem",
             'cursor': 'pointer',
             'transition': '0.3s'
         },
         ".removeBtn": {
-            'display': 'block',
-            "margin": "auto",
             "text-align": "center",
-            'padding': '0.5rem',
+            'padding': '0.3rem',
             "outline": "none",
             "border": "none",
-            "background-color": "#FFB6C1",
+            "background-color": "#FFF",
             "color": "#585858",
-            "border-radius": ".5rem",
+            "border-radius": ".3rem",
             'cursor': 'pointer',
             'transition': '0.3s'
         },
         ".input": {
             "margin": "auto",
             "text-align": "center",
-            "width": "95%",
+            "width": "40%",
             "border_radius": ".5rem",
             "outline": "none",
-            "padding": "1rem",
+            "padding": "0.3rem",
             "background-color": "#fff",
         },
         ".item": {
@@ -240,8 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "height": "10%",
         },
         ".list": {
-            "background-color": "#383838",
-            "justify-content": "center"
+            "background-color": "#0d0d0d"
 
         },
         'ul': {
@@ -255,20 +289,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ".objName": {
             "font-size": "large",
             "text-align": "center",
-            "padding": "5px 1px"
+            "padding": "2px 1px"
         },
         ".objPrice": {
             "font-size": "large",
             "text-align": "center"
         },
         "#shoplist": {
-            "font-size": "large",
+            "display": "block",
+            "font-size": "25px",
             "color": "white",
-            "left-postition": "50%"
+            "text-align": "center",
+            "padding-top": '10px',
+            "transform": "translateX(-11px)",
+            "font-family": "Consolas, monaco, monospace"
         },
-        ".objList li": {
-            'list-style-type': 'none',
-            'list-style': 'none'
+        ".objList": {
+            'display': 'flex',
+            'justify-content': 'center',
+            'align-items': 'center',
+            'text-align': 'center',
+            'background-color': '#1a1a1a'
         }
     };
 

@@ -1,15 +1,11 @@
 chrome.action.setIcon({
-    path : {
+    path: {
         "16": "img/icon_16.jpeg",
         "32": "img/icon_32.jpeg",
         "48": "img/icon_48.jpeg",
         "128": "img/icon_128.jpeg"
     }
 })
-
-const saveItems = function(data){
-
-}
 
 chrome.action.onClicked.addListener(function () {
     chrome.tabs.create({
@@ -20,4 +16,4 @@ chrome.action.onClicked.addListener(function () {
 })
 
 //chrome.action.setBadgeText({text: 'ON'});
-chrome.action.setBadgeBackgroundColor({color: '#4688F1'});
+chrome.action.setBadgeBackgroundColor({ color: '#4688F1' });
