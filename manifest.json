@@ -2,19 +2,38 @@
     "manifest_version": 3,
     "name": "ShopList",
     "version": "1.0",
-    "description": "a centralized wish list",
-    "content_scripts": [],
-    "icons": {},
+    "description": "A centralized wish list",
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "css": [],
+            "js": [
+                "popup.js"
+            ]
+        }
+    ],
+    "icons": {
+        "16": "/img/icon_16.jpeg",
+        "32": "/img/icon_32.jpeg",
+        "48": "/img/icon_48.jpeg",
+        "128": "/img/icon_128.jpeg"
+    },
     "background": {
         "service_worker": "background.js",
-        "action": {
-            "default_popup": "index.html"
-        },
         "permissions": [
             "storage"
         ]
     },
-    "action": {},
+    "action": {
+        "default_title": "ShopList",
+        "default_popup": "index.html",
+        "default_icon": {
+            "16": "img/icon_16.jpeg",
+            "32": "img/icon_32.jpeg"
+          }
+    },
     "permissions": [
         "storage",
         "downloads",

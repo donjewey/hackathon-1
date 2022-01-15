@@ -95,13 +95,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // Style Sheet
     const styles = {
         "body":{
-            "background-color": "#242424"
+            "background-color": "#242424",
+            "height": "600px",
+            "width": "400px"
+        },
+        "HTML":{
+            "height": "600px",
+            "width": "400px"
         },
         "#border": {
             "text-align": "center",
             "border": "2px solid white",
             "height": "75%",
-            "width": "50%"
+            "width": "95%"
         },
         "#submitButton":{
             "margin": "auto",
