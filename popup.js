@@ -100,13 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // obj image -check what website item is on
             let imgURL = '';
+
             for (let key in imgLogos) {
                 if (listOfObj[j].url.includes(key)) imgURL = imgLogos[key];
             }
             // if website not found, use default cart logo
             if (imgURL === '') imgURL = 'img/cart_logo.jpeg';
 
-                const objImg = document.createElement('img');
+            const objImg = document.createElement('img');
             objImg.setAttribute('src', imgURL);
             objImg.setAttribute('class', 'objImage');
             objList.appendChild(objImg);
@@ -201,27 +202,27 @@ document.addEventListener("DOMContentLoaded", () => {
             'display': 'block',
             "margin": "auto",
             "text-align": "center",
-            'padding' : '0.5rem',
+            'padding': '0.5rem',
             "outline": "none",
             "border": "none",
             "background-color": "#FFB6C1",
-            "color" :"#585858",
-            "border-radius" :".5rem",
+            "color": "#585858",
+            "border-radius": ".5rem",
             'cursor': 'pointer',
-            'transition':'0.3s'
+            'transition': '0.3s'
         },
         ".removeBtn": {
             'display': 'block',
             "margin": "auto",
             "text-align": "center",
-            'padding' : '0.5rem',
+            'padding': '0.5rem',
             "outline": "none",
             "border": "none",
             "background-color": "#FFB6C1",
-            "color" :"#585858",
-            "border-radius" :".5rem",
+            "color": "#585858",
+            "border-radius": ".5rem",
             'cursor': 'pointer',
-            'transition':'0.3s'
+            'transition': '0.3s'
         },
         ".input": {
             "margin": "auto",
@@ -240,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         ".list": {
             "background-color": "#383838",
-            "justify-content" : "center"
+            "justify-content": "center"
 
         },
         'ul': {
